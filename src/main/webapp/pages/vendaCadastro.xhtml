@@ -16,7 +16,7 @@
 	</ui:define>
 
 	<ui:define name="conteudo">
-		<h:form>
+		<h:form id="frmvencad">
 			<p:toolbar>
 				<f:facet name="left">
 					<h:outputText value="Vendas" />
@@ -45,15 +45,17 @@
 					<h:outputText value="#{produto.fornecedor.descricao}" />
 				</p:column>
 				<p:column headerText="Opções">
-					<p:button icon="ui-icon-plus">
-					</p:button>
+					<p:commandButton icon="ui-icon-plus" actionListener="#{MBVendas.adicionar(produto)}"
+					update=":frmvencad:tbItens :frmvencad:txtvenValorTotal">
+					</p:commandButton>
 				</p:column>
 			</p:dataTable>
 			
 			<p:separator />
 			<p:dataTable emptyMessage="Nenhum Registro Cadastrado"
 				value="#{MBVendas.itens}"
-				var="produto" rows="4" paginator="true">
+				var="item" rows="4" paginator="true"
+				id="tbItens">
 	
 				<p:column headerText="Descrição">
 					<h:outputText value="#{item.produto.descricao}" />
@@ -64,11 +66,51 @@
 				<p:column headerText="Quantidade">
 					<h:outputText value="#{item.quantidade}" />
 				</p:column>
+				<p:column headerText="Fornecedor">
+					<h:outputText value="#{item.produto.fornecedor.descricao}" />
+				</p:column>
 				<p:column headerText="Opções">
-					<p:button icon="ui-icon-close"/>
+					<p:commandButton icon="ui-icon-close" actionListener="#{MBVendas.remover(item)}"
+					update=":frmvencad:tbItens :frmvencad:txtvenValorTotal" />
 				</p:column>
 				</p:dataTable>
+				
+				<p:separator />
+				
+				<h:panelGrid columns="2" cellpadding="8">
+				
+				<h:outputText id="txtvenValorTotal" 
+				value="Valor Total: #{MBVendas.vendaCadastro.valor_total}"/>
+				<p:commandButton value="Finalizar Venda" actionListener="#{MBVendas.carregarDadosVenda}" 
+				oncomplete="PF('dlgFinVenda').show()" update=":dial"/>
+				</h:panelGrid>
 		</h:form>
+		
+		<p:dialog closable="true" draggable="true" modal="true"
+		resizable="false" header="Finalizar Venda" widgetVar="dlgFinVenda"
+		appendTo="@(body)" id="dial">
+			
+			<h:form>
+				<h:panelGrid columns="2">
+					<h:outputText value="Horário"/>
+					<h:outputText value="#{MBVendas.vendaCadastro.horario}" >
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="America/Sao_Paulo"/>
+					</h:outputText>
+					<h:outputText value="Funcionário" />
+					<h:outputText  value="#{MBVendas.vendaCadastro.funcionario.nome}" />
+					<h:outputText value="Valor Total" />
+					<h:outputText value="#{MBVendas.vendaCadastro.valor_total}" />
+					<h:panelGrid columns="2">
+					<p:commandButton value="Finalizar" actionListener="#{MBVendas.salvar}" 
+					update=":msgGlobal :frmvencad:tbItens :frmvencad:txtvenValorTotal" onclick="PF('dlgFinVenda').hide()"/>
+					<p:commandButton value="Voltar" 
+					onclick="PF('dlgFinVenda').hide()" />
+					</h:panelGrid>
+				</h:panelGrid>
+			</h:form>
+			
+		</p:dialog>
+		
 	</ui:define>
 
 </ui:composition>

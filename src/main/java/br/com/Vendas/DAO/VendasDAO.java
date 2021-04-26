@@ -10,14 +10,16 @@ import br.com.Vendas.domain.Vendas;
 import br.com.Vendas.util.HibernateUtil;
 
 public class VendasDAO {
-	public void salvar(Vendas vendas) {
+	public Long salvar(Vendas vendas) {
 		Session sessao = HibernateUtil.getSessionFactory().openSession();
 
 		Transaction transacao = null;
+		
+		Long codigo = null;
 
 		try {
 			transacao = sessao.beginTransaction();// abrindo transação
-			sessao.save(vendas);
+			codigo = (Long)sessao.save(vendas);
 			transacao.commit(); // confirmando a transação
 		} catch (RuntimeException e) {
 
@@ -29,6 +31,8 @@ public class VendasDAO {
 		} finally {
 			sessao.close();
 		}
+		
+		return codigo;
 	}
 
 	@SuppressWarnings("unchecked")
